@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>/Users/xuyang/Documents/Gridea/output</id>
+    <id>http://xybingbing.github.io</id>
     <title>Gridea</title>
-    <updated>2019-07-02T01:51:28.362Z</updated>
+    <updated>2019-07-02T02:12:36.710Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="/Users/xuyang/Documents/Gridea/output"/>
-    <link rel="self" href="/Users/xuyang/Documents/Gridea/output/atom.xml"/>
+    <link rel="alternate" href="http://xybingbing.github.io"/>
+    <link rel="self" href="http://xybingbing.github.io/atom.xml"/>
     <subtitle>温故而知新</subtitle>
-    <logo>/Users/xuyang/Documents/Gridea/output/images/avatar.png</logo>
-    <icon>/Users/xuyang/Documents/Gridea/output/favicon.ico</icon>
+    <logo>http://xybingbing.github.io/images/avatar.png</logo>
+    <icon>http://xybingbing.github.io/favicon.ico</icon>
     <rights>All rights reserved 2019, Gridea</rights>
     <entry>
         <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>/Users/xuyang/Documents/Gridea/output/post/hello-gridea/index.html</id>
-        <link href="/Users/xuyang/Documents/Gridea/output/post/hello-gridea/index.html">
+        <id>http://xybingbing.github.io/post/hello-gridea</id>
+        <link href="http://xybingbing.github.io/post/hello-gridea">
         </link>
         <updated>2018-12-11T16:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
