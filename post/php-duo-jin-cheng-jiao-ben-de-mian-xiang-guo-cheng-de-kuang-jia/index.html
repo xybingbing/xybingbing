@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>php技术分享</title>
+<title>php 多进程脚本的面向过程的框架 | php技术分享</title>
 <meta name="description" content="技术分享">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -95,27 +95,109 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://xybingbing.github.io/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia">
-                  <h2 class="post-title">php 多进程脚本的面向过程的框架</h2>
-                </a>
-                <div class="post-date">
-                  2019-02-06
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">php 多进程脚本的面向过程的框架</h2>
+            <div class="post-date">2019-02-06</div>
+            
+            <div class="post-content">
+              <h1 id="php-多进程脚本的面向过程的框架">php 多进程脚本的面向过程的框架</h1>
+<h3 id="创建进程函数">创建进程函数</h3>
+<pre><code>process($name，$function，$parameter， $is_auto);
+$name 进程名字。
+$function 回调函数，用于具体的工作内容。
+$parameter 回调函数的参数。
+$is_auto 默认值为0，任务异常脚本退出后重新拉起进程。一般用于队列消费。防止程序异常退出，队列消息无法处理。
+</code></pre>
+<h3 id="实现的代码">实现的代码</h3>
+<pre><code>&lt;?php
 
-          <div class="pagination-container">
-  
-  
-</div>
+umask(0);  	//设置umask为0，这样，当前进程创建的文件权限则为777
+$pid = pcntl_fork();
+if( $pid &lt; 0 ){
+	exit('fork error.');
+} else if( $pid &gt; 0 ) {
+	exit;
+}
+
+// 最关键的一步来了，执行setsid函数！
+if( !posix_setsid() ){
+	exit('setsid error.');
+}
+
+$pid = pcntl_fork();
+if( $pid  &lt; 0 ){
+	exit('fork error.');
+} else if( $pid &gt; 0 ) {
+	exit;
+}
+
+
+//fork出的子进程列表
+$child_pid=[];
+
+function process($name, $my_function, $data=[], $is_auto=0){
+	global $child_pid;
+	$_pid = pcntl_fork();
+	if( $_pid &lt; 0 ){
+		exit('创建进程失败');
+	} else if( $_pid &gt; 0 ) {
+		$child_pid[$_pid]['name']=$name;
+		$child_pid[$_pid]['is_auto']=$is_auto;
+		$child_pid[$_pid]['data']=$data;
+		$child_pid[$_pid]['data']['pid']=$_pid;
+		$child_pid[$_pid]['my_function']=$my_function;
+	} else {
+		$data['pid']=getmypid();
+		call_user_func_array($my_function, array(&amp;$data));
+		exit;
+	}
+}
+
+
+//任务代码写到这里——AND
+
+//使用子进程来干活
+process(&quot;第一个进程&quot;, function($data){
+		
+		sleep(5);
+		print_r($data);
+		
+}, ['id'=&gt;2], 0);
+
+
+process(&quot;第二个进程&quot;, function($data){
+		
+		sleep(10);
+		print_r($data);
+		
+}, ['id'=&gt;10, &quot;name&quot;=&gt;&quot;小明&quot;], 0);
+
+//任务代码写到这里——END
+
+while (pcntl_waitpid(0, $status) != -1) {
+	$status = pcntl_wexitstatus($status);
+	$child_pid_num = count($child_pid);
+	if($child_pid_num &gt; 0){
+		foreach ($child_pid as $pid =&gt; $item) {	
+			$wait_result = pcntl_waitpid($pid, $status, WNOHANG);
+			if($wait_result==-1 &amp;&amp; $status==0){
+				unset($child_pid[$pid]);
+				if($item['is_auto']==1){
+					process($item['name'], $item['my_function'], $item['data'], $item['is_auto']);
+				}
+			}
+		}
+	}
+}
+</code></pre>
+
+            </div>
+            
+            
+
+            
+
+          </div>
 
         </div>
       </div>

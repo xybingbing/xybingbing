@@ -1,13 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xybingbing.github.io</id>
-    <title>Gridea</title>
-    <updated>2019-07-03T06:50:44.344Z</updated>
+    <title>php技术分享</title>
+    <updated>2019-07-03T09:53:14.321Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xybingbing.github.io"/>
     <link rel="self" href="https://xybingbing.github.io/atom.xml"/>
-    <subtitle>温故而知新</subtitle>
+    <subtitle>技术分享</subtitle>
     <logo>https://xybingbing.github.io/images/avatar.png</logo>
     <icon>https://xybingbing.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2019, Gridea</rights>
+    <rights>All rights reserved 2019, php技术分享</rights>
+    <entry>
+        <title type="html"><![CDATA[php 多进程脚本的面向过程的框架]]></title>
+        <id>https://xybingbing.github.io/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia</id>
+        <link href="https://xybingbing.github.io/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia">
+        </link>
+        <updated>2019-02-06T06:54:28.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="php-多进程脚本的面向过程的框架">php 多进程脚本的面向过程的框架</h1>
+<h3 id="创建进程函数">创建进程函数</h3>
+<pre><code>process($name，$function，$parameter， $is_auto);
+$name 进程名字。
+$function 回调函数，用于具体的工作内容。
+$parameter 回调函数的参数。
+$is_auto 默认值为0，任务异常脚本退出后重新拉起进程。一般用于队列消费。防止程序异常退出，队列消息无法处理。
+</code></pre>
+<h3 id="实现的代码">实现的代码</h3>
+<pre><code>&lt;?php
+
+umask(0);  	//设置umask为0，这样，当前进程创建的文件权限则为777
+$pid = pcntl_fork();
+if( $pid &lt; 0 ){
+	exit('fork error.');
+} else if( $pid &gt; 0 ) {
+	exit;
+}
+
+// 最关键的一步来了，执行setsid函数！
+if( !posix_setsid() ){
+	exit('setsid error.');
+}
+
+$pid = pcntl_fork();
+if( $pid  &lt; 0 ){
+	exit('fork error.');
+} else if( $pid &gt; 0 ) {
+	exit;
+}
+
+
+//fork出的子进程列表
+$child_pid=[];
+
+function process($name, $my_function, $data=[], $is_auto=0){
+	global $child_pid;
+	$_pid = pcntl_fork();
+	if( $_pid &lt; 0 ){
+		exit('创建进程失败');
+	} else if( $_pid &gt; 0 ) {
+		$child_pid[$_pid]['name']=$name;
+		$child_pid[$_pid]['is_auto']=$is_auto;
+		$child_pid[$_pid]['data']=$data;
+		$child_pid[$_pid]['data']['pid']=$_pid;
+		$child_pid[$_pid]['my_function']=$my_function;
+	} else {
+		$data['pid']=getmypid();
+		call_user_func_array($my_function, array(&amp;$data));
+		exit;
+	}
+}
+
+
+//任务代码写到这里——AND
+
+//使用子进程来干活
+process(&quot;第一个进程&quot;, function($data){
+		
+		sleep(5);
+		print_r($data);
+		
+}, ['id'=&gt;2], 0);
+
+
+process(&quot;第二个进程&quot;, function($data){
+		
+		sleep(10);
+		print_r($data);
+		
+}, ['id'=&gt;10, &quot;name&quot;=&gt;&quot;小明&quot;], 0);
+
+//任务代码写到这里——END
+
+while (pcntl_waitpid(0, $status) != -1) {
+	$status = pcntl_wexitstatus($status);
+	$child_pid_num = count($child_pid);
+	if($child_pid_num &gt; 0){
+		foreach ($child_pid as $pid =&gt; $item) {	
+			$wait_result = pcntl_waitpid($pid, $status, WNOHANG);
+			if($wait_result==-1 &amp;&amp; $status==0){
+				unset($child_pid[$pid]);
+				if($item['is_auto']==1){
+					process($item['name'], $item['my_function'], $item['data'], $item['is_auto']);
+				}
+			}
+		}
+	}
+}
+</code></pre>
+]]></content>
+    </entry>
 </feed>
