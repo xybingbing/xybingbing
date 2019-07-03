@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://xybingbing.github.io</id>
+    <id>http://www.1d501.com</id>
     <title>php技术分享</title>
-    <updated>2019-07-03T10:29:13.332Z</updated>
+    <updated>2019-07-03T10:33:41.652Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://xybingbing.github.io"/>
-    <link rel="self" href="https://xybingbing.github.io/atom.xml"/>
+    <link rel="alternate" href="http://www.1d501.com"/>
+    <link rel="self" href="http://www.1d501.com/atom.xml"/>
     <subtitle>技术分享</subtitle>
-    <logo>https://xybingbing.github.io/images/avatar.png</logo>
-    <icon>https://xybingbing.github.io/favicon.ico</icon>
+    <logo>http://www.1d501.com/images/avatar.png</logo>
+    <icon>http://www.1d501.com/favicon.ico</icon>
     <rights>All rights reserved 2019, php技术分享</rights>
     <entry>
         <title type="html"><![CDATA[php 多进程脚本的面向过程的框架]]></title>
-        <id>https://xybingbing.github.io/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia</id>
-        <link href="https://xybingbing.github.io/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia">
+        <id>http://www.1d501.com/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia</id>
+        <link href="http://www.1d501.com/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia">
         </link>
         <updated>2019-02-06T06:54:28.000Z</updated>
         <content type="html"><![CDATA[<h1 id="php-多进程脚本的面向过程的框架">php 多进程脚本的面向过程的框架</h1>
