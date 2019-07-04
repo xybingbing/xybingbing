@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>http://www.1d501.com</id>
     <title>php技术分享</title>
-    <updated>2019-07-03T10:33:41.652Z</updated>
+    <updated>2019-07-04T08:28:07.046Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="http://www.1d501.com"/>
     <link rel="self" href="http://www.1d501.com/atom.xml"/>
@@ -11,9 +11,99 @@
     <icon>http://www.1d501.com/favicon.ico</icon>
     <rights>All rights reserved 2019, php技术分享</rights>
     <entry>
+        <title type="html"><![CDATA[面向对象的php进程框架]]></title>
+        <id>http://www.1d501.com/post/U_nOyA0G2</id>
+        <link href="http://www.1d501.com/post/U_nOyA0G2">
+        </link>
+        <updated>2019-02-07T08:24:46.000Z</updated>
+        <content type="html"><![CDATA[<pre><code>class Process
+{
+	
+	public static $daemonize = true;
+	public static $monitor = false;
+	public static $run = false;
+	public static $child = [];
+	
+	public static function run($name, $task_function, $data=[], $is_auto=0)
+	{
+		static::daemonize();
+		static::workers($name, $task_function, $data=[], $is_auto);
+		static::monitor(static::$child);
+	}
+
+	protected static function daemonize()
+	{
+		if (!static::$daemonize || static::$run) {
+			return;
+		}
+		umask(0);
+		$pid = pcntl_fork();
+		if (-1 === $pid) {
+			exit('创建进程失败');
+		} elseif ($pid &gt; 0) {
+			exit(0);
+		}
+		if (-1 === posix_setsid()) {
+			exit('setsid 失败');
+		}
+		$pid = pcntl_fork();
+		if (-1 === $pid) {
+			exit('创建进程失败');
+		} elseif (0 !== $pid) {
+			exit(0);
+		}
+	}
+	
+	protected static function workers($name, $task_function, $data=[], $is_auto=0)
+	{
+		$pid = pcntl_fork();
+		if( $pid &lt; 0 ){
+			exit('创建进程失败');
+		} else if( $pid &gt; 0 ) {
+			echo &quot;---&quot;.getmypid().&quot;---&quot;.$pid.&quot;----\n&quot;;
+			static::$child[$pid]['name']=$name;
+			static::$child[$pid]['is_auto']=$is_auto;
+			static::$child[$pid]['data']=$data;
+			static::$child[$pid]['data']['pid']=$pid;
+			static::$child[$pid]['task_function']=$task_function;
+		} else {
+			$data['pid']=getmypid();
+			sleep(1);
+			call_user_func_array($task_function, array(&amp;$data));
+			exit(0);
+		}
+	}
+	
+	protected static function monitor(&amp;$child)
+	{
+		static::$monitor=true;
+		static::$run=true;
+		while (pcntl_waitpid(0, $status) != -1) {
+			$status = pcntl_wexitstatus($status);
+			$child_pid_num = count($child);			
+			if($child_pid_num &gt; 0){
+				foreach ($child as $pid =&gt; $item) {	
+					$wait_result = pcntl_waitpid($pid, $status, WNOHANG);
+					if($wait_result==-1){
+						unset($child[$pid]);
+						if($item['is_auto']==1){
+							sleep(1); //休眠1秒后重新拉起进程
+							static::workers($item['name'], $item['task_function'], $item['data'], $item['is_auto']);
+						}
+					}
+				}
+			}
+
+		}
+	}
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[php 多进程脚本的面向过程的框架]]></title>
-        <id>http://www.1d501.com/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia</id>
-        <link href="http://www.1d501.com/post/php-duo-jin-cheng-jiao-ben-de-mian-xiang-guo-cheng-de-kuang-jia">
+        <id>http://www.1d501.com/post/php-duo-jin-cheng</id>
+        <link href="http://www.1d501.com/post/php-duo-jin-cheng">
         </link>
         <updated>2019-02-06T06:54:28.000Z</updated>
         <content type="html"><![CDATA[<h1 id="php-多进程脚本的面向过程的框架">php 多进程脚本的面向过程的框架</h1>
